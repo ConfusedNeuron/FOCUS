@@ -1,34 +1,37 @@
-# AI-Powered Funding Intelligence – GSoC Screening Task
+# FOCUS: Funding Opportunity Classification & Understanding System
+___
+
+## AI-Powered Funding Intelligence – GSoC Screening Task
 
 **Project:** ISSR4 – AI-Powered Funding Intelligence (FOA Ingestion + Semantic Tagging)
 **Author:** Pranav Taneja
 
 ---
 
-## Overview
+### Overview
 
 This repository contains the screening task implementation for the ISSR4 project. It provides a lightweight, deterministic, and highly robust CLI pipeline that ingests Funding Opportunity Announcements (FOAs) from **Grants.gov** and the **National Science Foundation (NSF)**, normalizes the data into a strict schema, applies rule-based semantic tagging, and exports the results to reproducible JSON and CSV formats.
 
 ---
 
-## Quick Start
+### Quick Start
 
-### Installation
+#### Installation
 
 ```bash
-# Create and activate a virtual environment
+## Create and activate a virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  ## On Windows: venv\Scripts\activate
 
-# Install requirements
+## Install requirements
 pip install -r requirements.txt
 ```
 
-### Usage
+#### Usage
 
 The pipeline strictly adheres to the requested execution format and dynamically detects the source based on the provided URL.
 
-#### Grants.gov example
+##### Grants.gov example
 
 ```bash
 python main.py \
@@ -36,7 +39,7 @@ python main.py \
   --out_dir ./out
 ```
 
-#### NSF example
+##### NSF example
 
 ```bash
 python main.py \
@@ -46,7 +49,7 @@ python main.py \
 
 ---
 
-## Key Engineering Decisions
+### Key Engineering Decisions
 
 To ensure the pipeline is resilient, scalable, and reproducible, several specific architectural choices were made over standard web scraping techniques:
 
@@ -69,11 +72,11 @@ To ensure the pipeline is resilient, scalable, and reproducible, several specifi
 
 ---
 
-## Semantic Tagging Ontology
+### Semantic Tagging Ontology
 
 The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 labels across 4 categories, triggered by keyword matching within the FOA title and description.
 
-### Research domains
+#### Research domains
 
 - Health & Medicine
 - Engineering & Technology
@@ -84,7 +87,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 - Mathematics
 - Environmental Sciences
 
-### Methods
+#### Methods
 
 - Clinical Trials
 - Laboratory Research
@@ -93,7 +96,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 - Field Studies
 - Survey Research
 
-### Populations
+#### Populations
 
 - General Public
 - Children & Adolescents
@@ -101,7 +104,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 - Veterans
 - Underserved Communities
 
-### Themes
+#### Themes
 
 - Innovation & Entrepreneurship
 - Workforce Development
@@ -110,7 +113,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 
 ---
 
-## File Manifest
+### File Manifest
 
 - `main.py` – Core object-oriented extraction and tagging pipeline.
 - `requirements.txt` – Minimal dependencies (`requests`, `beautifulsoup4`).
@@ -120,7 +123,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 
 ---
 
-## Future Roadmap (GSoC Proposal Teaser)
+### Future Roadmap (GSoC Proposal Teaser)
 
 While this script strictly follows the “minimal single URL” constraint of the screening task, the full GSoC implementation architecture will introduce:
 
