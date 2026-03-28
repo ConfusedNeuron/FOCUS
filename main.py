@@ -17,10 +17,17 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
-from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
+
+# For enhanced terminal output
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.rule import Rule
+
+console = Console()
 
 
 @dataclass
@@ -60,7 +67,6 @@ class FOA:
 class RuleBasedTagger:
     """Deterministic semantic tagger using keyword matching"""
 
-    # Ontology: category -> label -> keywords
     ONTOLOGY = {
         "research_domains": {
             "Health & Medicine": ["health", "medical", "clinical", "disease", "patient", "healthcare"],
@@ -117,7 +123,6 @@ class RuleBasedTagger:
 class GrantsGovAdapter:
     """Adapter for Grants.gov FOAs using the modern REST API"""
 
-    # Using the new official v1 API which does not require authentication
     API_BASE = "https://api.grants.gov/v1/api/fetchOpportunity"
 
     def extract_opp_id(self, url: str) -> str:
@@ -131,7 +136,7 @@ class GrantsGovAdapter:
         """Fetch and parse Grants.gov FOA using modern JSON API"""
         opp_id = self.extract_opp_id(url)
 
-        print(f"Fetching from Official API: {self.API_BASE} (POST)")
+        console.print(f"[dim]Fetching from API: {self.API_BASE} (POST)[/dim]")
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -139,7 +144,6 @@ class GrantsGovAdapter:
             "Content-Type": "application/json; charset=UTF-8"
         }
 
-        # The new API expects opportunityId (not oppId)
         payload = {"opportunityId": int(opp_id)}
 
         response = requests.post(self.API_BASE, json=payload, headers=headers, timeout=30)
@@ -147,16 +151,13 @@ class GrantsGovAdapter:
 
         response_json = response.json()
 
-        # The actual opportunity data is nested inside the 'data' key
         data = response_json.get('data', {})
         if not data:
             raise ValueError(f"No data found in API response. Raw response: {response_json}")
 
-        # Handle potential nesting depending on the grant structure
         synopsis_dict = data.get('synopsis', data)
         synopsis_desc = synopsis_dict.get('synopsisDesc', data.get('description', ''))
 
-        # Clean HTML tags that might be in the JSON description
         clean_desc = BeautifulSoup(synopsis_desc, "html.parser").get_text(separator=' ') if synopsis_desc else "No description available"
 
         foa = FOA(
@@ -181,7 +182,7 @@ class NSFAdapter:
 
     def fetch(self, url: str) -> FOA:
         """Fetch and parse NSF FOA"""
-        print(f"Fetching from URL: {url}")
+        console.print(f"[dim]Fetching from URL: {url}[/dim]")
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
@@ -194,7 +195,6 @@ class NSFAdapter:
         title_elem = soup.find('h1')
         title = title_elem.get_text(strip=True) if title_elem else "Unknown"
 
-        # Robust Heading-Based Extraction
         sections = {}
         for header in soup.find_all(['h2', 'h3']):
             section_name = header.get_text(strip=True).lower()
@@ -227,7 +227,6 @@ class NSFAdapter:
                 except ValueError:
                     pass
 
-        # Deterministic hash generation
         foa_id = f"nsf_{hashlib.md5(url.encode()).hexdigest()[:8]}"
 
         foa = FOA(
@@ -238,7 +237,7 @@ class NSFAdapter:
             source_url=url,
             posted_date=None,
             close_date=None,
-            description=description[:5000],  # Safeguard for DB constraints
+            description=description[:5000],
             eligibility=eligibility,
             award_floor=award_floor,
             award_ceiling=award_ceiling,
@@ -275,7 +274,7 @@ def export_json(foa: FOA, output_path: Path):
     data = foa.to_dict()
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-    print(f"✓ JSON exported to {output_path}")
+    console.print(f"[bold green]✓[/bold green] JSON exported to [cyan]{output_path}[/cyan]")
 
 
 def export_csv(foa: FOA, output_path: Path):
@@ -293,7 +292,7 @@ def export_csv(foa: FOA, output_path: Path):
         writer = csv.DictWriter(f, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         writer.writerow(data)
-    print(f"✓ CSV exported to {output_path}")
+    console.print(f"[bold green]✓[/bold green] CSV exported to [cyan]{output_path}[/cyan]")
 
 
 def main():
@@ -303,19 +302,21 @@ def main():
     )
     parser.add_argument('--url', required=True, help='FOA URL (Grants.gov or NSF)')
     parser.add_argument('--out_dir', default='./out', help='Output directory (default: ./out)')
-
+    parser.add_argument('--filename', default='foa', help='Base name for output files (default: foa)')
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 60)
-    print("FOA Intelligence Pipeline - Screening Task")
-    print("=" * 60)
+    # Rich Header
+    console.print("\n")
+    console.print(Rule("[bold cyan]FOCUS: Funding Opportunity Classification & Understanding System[/bold cyan]", style="cyan"))
+    console.print("[bold dim]FOA Intelligence Pipeline - Screening Task[/bold dim]", justify="center")
+    console.print("\n")
 
     try:
         source = detect_source(args.url)
-        print(f"Detected source: {source}")
+        console.print(f"[*] Detected source: [bold magenta]{source}[/bold magenta]")
 
         if source == "grants_gov":
             adapter = GrantsGovAdapter()
@@ -324,22 +325,48 @@ def main():
             adapter = NSFAdapter()
             foa = adapter.fetch(args.url)
 
-        print(f"✓ Extracted FOA: {foa.title}")
+        console.print(f"[bold green]✓[/bold green] Extracted FOA: [bold]{foa.title}[/bold]")
 
         tagger = RuleBasedTagger()
         foa = apply_tags(foa, tagger)
 
-        print(f"✓ Applied tags:")
-        print(f"  - Research Domains: {foa.tags_research_domains or 'None'}")
-        print(f"  - Methods: {foa.tags_methods or 'None'}")
+        export_json(foa, out_dir / f'{args.filename}.json')
+        export_csv(foa, out_dir / f'{args.filename}.csv')
 
-        export_json(foa, out_dir / 'foa.json')
-        export_csv(foa, out_dir / 'foa.csv')
+        console.print("\n")
 
-        print("\n✅ SUCCESS - FOA extraction complete!")
+        # Rich Table
+        tag_table = Table(show_header=True, header_style="bold magenta")
+        tag_table.add_column("Category", style="cyan")
+        tag_table.add_column("Assigned Tags", style="green")
+
+        tag_table.add_row("Research Domains", ", ".join(foa.tags_research_domains) if foa.tags_research_domains else "None")
+        tag_table.add_row("Methods", ", ".join(foa.tags_methods) if foa.tags_methods else "None")
+        tag_table.add_row("Populations", ", ".join(foa.tags_populations) if foa.tags_populations else "None")
+        tag_table.add_row("Themes", ", ".join(foa.tags_themes) if foa.tags_themes else "None")
+
+        # Rich Success Panel
+        success_panel = Panel(
+            tag_table,
+            title=f"[bold green]✅ Successfully Extracted: {foa.foa_id}[/bold green]",
+            subtitle=f"[dim]Saved to {out_dir}/{args.filename}.json[/dim]",
+            expand=False,
+            border_style="green"
+        )
+        console.print(success_panel)
+        console.print("\n")
 
     except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+        # Rich Error Panel
+        error_panel = Panel(
+            f"[bold red]{str(e)}[/bold red]",
+            title="[bold red]❌ Fatal Error[/bold red]",
+            expand=False,
+            border_style="red"
+        )
+        console.print("\n")
+        console.print(error_panel)
+        console.print("\n")
         sys.exit(1)
 
 
