@@ -4,6 +4,7 @@ ___
 ## AI-Powered Funding Intelligence – GSoC Screening Task
 
 **Project:** ISSR4 – AI-Powered Funding Intelligence (FOA Ingestion + Semantic Tagging)
+
 **Author:** Pranav Taneja
 
 ---
@@ -54,6 +55,26 @@ python main.py \
   --out_dir ./out
 ```
 
+#### 🛡️ Edge Case & Robustness Testing
+
+This pipeline was engineered to handle highly variable structural anomalies that typical web scrapers fail on. Reviewers are encouraged to test the following edge-case URLs:
+
+**1. The Grants.gov WAF Bypass (API Routing)**
+Standard scrapers often receive a `403 Forbidden` or `405 Method Not Allowed` on this URL due to internal redirects. Our pipeline uses the `v1/api/fetchOpportunity` POST endpoint to ingest it flawlessly.
+```bash
+python main.py \
+   --url "https://www.grants.gov/search-results-detail/352603" \
+   --out_dir ./out
+```
+
+**2. The NSF Structural Anomaly (DOM Traversal)**
+Many NSF pages lack a standard "Synopsis" tag, breaking regex-based extractors. Our heading-based DOM traversal dynamically captures the program description regardless of layout.
+
+```Bash
+python main.py \
+   --url "https://www.nsf.gov/funding/opportunities/computer-and-information-science-and-engineering-core-programs" \
+   --out_dir ./out
+```
 ---
 
 ### Key Engineering Decisions
@@ -82,6 +103,16 @@ To ensure the pipeline is resilient, scalable, and reproducible, several specifi
 ### Semantic Tagging Ontology
 
 The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 labels across 4 categories, triggered by keyword matching within the FOA title and description.
+
+### Evaluation & Accuracy Metrics
+
+To satisfy the "Basic Evaluation" requirement and ensure tagging consistency, this repository includes a standalone evaluation module. It calculates strict multi-label metrics (Precision, Recall, and F1-Score) by comparing the pipeline's deterministic output against a manually annotated Golden Dataset of diverse funding opportunities.
+
+**Run the Evaluation:**
+```bash
+python evaluate.py
+```
+Note: The evaluation script imports the core tagger directly to test algorithmic accuracy in isolation, executing instantly without requiring live network requests.
 
 #### Research domains
 
@@ -123,6 +154,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 ### File Manifest
 
 - `main.py` – Core object-oriented extraction and tagging pipeline.
+- `evaluate.py` – Standalone evaluation module computing pipeline accuracy metrics.
 - `requirements.txt` – Minimal dependencies (`requests`, `beautifulsoup4`).
 - `README.md` – System documentation.
 - `out/foa.json` – Sample structured JSON output.
@@ -130,7 +162,7 @@ The `RuleBasedTagger` utilizes a strict deterministic dictionary covering 23 lab
 
 ---
 
-### Future Roadmap (GSoC Proposal Teaser)
+### Future Roadmap
 
 While this script strictly follows the “minimal single URL” constraint of the screening task, the full GSoC implementation architecture will introduce:
 
