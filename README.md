@@ -31,6 +31,13 @@ pip install -r requirements.txt
 
 The pipeline strictly adheres to the requested execution format and dynamically detects the source based on the provided URL.
 
+**View Help Menu:**
+You can view all available commands, descriptions, and optional flags (like custom file naming) using the built-in help argument:
+
+```bash
+python main.py -h
+```
+
 ##### Grants.gov example
 
 ```bash
@@ -43,7 +50,7 @@ python main.py \
 
 ```bash
 python main.py \
-  --url "https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=505658" \
+  --url "https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program" \
   --out_dir ./out
 ```
 

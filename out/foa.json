@@ -1,20 +1,21 @@
 {
-  "foa_id": "grants_gov_349207",
-  "title": "Understanding PRC Economic Activities in the Philippines",
-  "agency": "Unknown Agency",
-  "source": "grants_gov",
-  "source_url": "https://www.grants.gov/search-results-detail/349207",
+  "foa_id": "nsf_d9bda919",
+  "title": "NSF Graduate Research Fellowship Program (GRFP)",
+  "agency": "NSF",
+  "source": "nsf",
+  "source_url": "https://www.nsf.gov/funding/opportunities/grfp-nsf-graduate-research-fellowship-program",
   "posted_date": null,
   "close_date": null,
-  "description": "The Global Engagement Center (GEC) at the Department of State, announces the Notice of Funding Opportunity for Understanding PRC Economic Activities in the Philippines, an open competition for organizations to submit applications to carry out research and assessment of activity of the PRC state-owned enterprises in the Philippines and their societal, environmental and economic impacts.",
+  "description": "No description available",
   "eligibility": null,
-  "award_floor": 0.0,
-  "award_ceiling": 350000.0,
-  "tags_research_domains": [
-    "Environmental Sciences"
+  "award_floor": 37000.0,
+  "award_ceiling": 16000.0,
+  "tags_research_domains": [],
+  "tags_methods": [
+    "Laboratory Research",
+    "Machine Learning"
   ],
-  "tags_methods": [],
   "tags_populations": [],
   "tags_themes": [],
-  "extracted_at": "2026-03-27T23:15:52.194024"
+  "extracted_at": "2026-03-29T02:19:36.774318"
 }
