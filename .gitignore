@@ -5,4 +5,20 @@ venv
 #OS files
 .DS_STORE
 
+# Python
+*.pyc
+__pycache__/
+*.so
+*.egg-info/
+dist/
+build/
 
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Output
+out/
+test_*/
+*.log

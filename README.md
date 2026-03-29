@@ -55,7 +55,7 @@ python main.py \
   --out_dir ./out
 ```
 
-#### 🛡️ Edge Case & Robustness Testing
+#### Edge Case & Robustness Testing
 
 This pipeline was engineered to handle highly variable structural anomalies that typical web scrapers fail on. Reviewers are encouraged to test the following edge-case URLs:
 
@@ -75,6 +75,31 @@ python main.py \
    --url "https://www.nsf.gov/funding/opportunities/computer-and-information-science-and-engineering-core-programs" \
    --out_dir ./out
 ```
+
+**3. Health/Medical FOA (Multi-domain tagging)**
+```bash
+python main.py \
+  --url "https://www.grants.gov/search-results-detail/352603" \
+  --out_dir ./out
+```
+Expected tags: Health & Medicine, Clinical Trials
+
+**4. STEM Education Focus**
+```bash
+python main.py \
+  --url "https://www.grants.gov/search-results-detail/349207" \
+  --out_dir ./out
+```
+Expected tags: Mathematics, STEM Education
+
+**5. Environmental/Climate Research**
+```bash
+python main.py \
+  --url "https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=503817" \
+  --out_dir ./out
+```
+Expected tags: Environmental Sciences, Climate & Sustainability
+
 ---
 
 ### Key Engineering Decisions

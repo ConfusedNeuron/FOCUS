@@ -5,6 +5,7 @@ Robust script for single FOA ingestion with deterministic rule-based tagging
 and production-ready data normalization.
 
 Usage: python main.py --url "FOA_URL" --out_dir ./out
+
 """
 
 import argparse
@@ -29,7 +30,8 @@ from rich.rule import Rule
 
 console = Console()
 
-
+__version__ = "1.0.0"
+__author__ = "Pranav Taneja"
 @dataclass
 class FOA:
     """FOA data structure matching required schema"""
@@ -298,7 +300,8 @@ def export_csv(foa: FOA, output_path: Path):
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(
-        description='FOA Intelligence Pipeline - Extract and tag funding opportunities'
+        description=f'FOCUS v{__version__} - FOA Intelligence Pipeline',
+        epilog='For issues: https://github.com/ConfusedNeuron/FOCUS.git'
     )
     parser.add_argument('--url', required=True, help='FOA URL (Grants.gov or NSF)')
     parser.add_argument('--out_dir', default='./out', help='Output directory (default: ./out)')
