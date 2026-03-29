@@ -82,7 +82,6 @@ python main.py \
   --url "https://www.grants.gov/search-results-detail/352603" \
   --out_dir ./out
 ```
-Expected tags: Health & Medicine, Clinical Trials
 
 **4. STEM Education Focus**
 ```bash
@@ -90,15 +89,14 @@ python main.py \
   --url "https://www.grants.gov/search-results-detail/349207" \
   --out_dir ./out
 ```
-Expected tags: Mathematics, STEM Education
 
-**5. Environmental/Climate Research**
+**5. Invalid Link(does not exist)**
 ```bash
 python main.py \
   --url "https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=503817" \
   --out_dir ./out
 ```
-Expected tags: Environmental Sciences, Climate & Sustainability
+
 
 ---
 
